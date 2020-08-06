@@ -1,10 +1,11 @@
+from typing import List, Dict, Any 
 from sqlalchemy import Column, String, DateTime, Integer
 from sqlalchemy.orm import relationship, backref
 from datetime import datetime
-from Utils.Base import Base 
+from Models.BaseModels.BaseModel import DataModel
 
 
-class TestCase(Base):
+class TestCase(DataModel):
     __tablename__ = "testcases"
 
     test_id = Column(Integer, primary_key=True)
@@ -15,7 +16,8 @@ class TestCase(Base):
     
     people = relationship("People", backref=backref("testcase"), lazy="dynamic", cascade="all,delete")
 
-    def __repr__(self):
-        return f"TestCase(test_id={self.test_id}, suite_name={self.suite_name}, "\
-               f"test_name={self.test_name}, status={self.status}, " \
-               f"execution_time={self.execution_time})"
+    @classmethod
+    def find_by_test_id(cls, test_id: int, session) -> "TestCase":
+        return session.query(cls).filter(cls.test_id == test_id).first()
+
+    
