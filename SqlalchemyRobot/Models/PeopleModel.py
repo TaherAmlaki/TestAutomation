@@ -1,5 +1,5 @@
 from sqlalchemy import Column, String, DateTime, Integer, ForeignKey, Date
-from Models.BaseModels.BaseModel import DataModel
+from Models.BaseModel import DataModel
 
 
 class People(DataModel):

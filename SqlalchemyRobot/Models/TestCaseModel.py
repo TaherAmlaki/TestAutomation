@@ -2,7 +2,7 @@ from typing import List, Dict, Any
 from sqlalchemy import Column, String, DateTime, Integer
 from sqlalchemy.orm import relationship, backref
 from datetime import datetime
-from Models.BaseModels.BaseModel import DataModel
+from Models.BaseModel import DataModel
 
 
 class TestCase(DataModel):

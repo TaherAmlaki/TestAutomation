@@ -9,3 +9,6 @@ Save New Person To DB
     ${person.name} =  set variable  ${name}
     ${person.test_id} =  set variable  ${test_id}
     People.save  ${db_session}
+    set test variable  ${person_id}  ${person.person_id}
+    [return]  ${person_id}
+    
