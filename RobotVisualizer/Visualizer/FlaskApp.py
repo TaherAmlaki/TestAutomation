@@ -15,7 +15,8 @@ def home():
     return render_template("index.html", 
                             tree=tree_data, 
                             extra_inks=extra_links,
-                            leaf_nodes = leaf_nodes)
+                            leaf_nodes = leaf_nodes,
+                            show_labels = labels)
 
 
 if __name__ == "__main__":
@@ -26,6 +27,16 @@ if __name__ == "__main__":
         except IndexError:
             raise IndexError("suite_path value is not found") from None
     
+    labels = False
+    if "-labels" in sys.argv:
+        try:
+            ind = sys.argv.index("-labels") + 1
+            labels = sys.argv[ind]
+            labels = True if labels.lower() == "true" else False
+        except IndexError:
+            pass 
+
+    print("==========> labels: ", labels)
     listener = VisualizerListener()
     options = {"log": None, "output": None, "report": None, 
                "listener": listener, "dryrun": "yes"}

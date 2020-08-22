@@ -93,7 +93,8 @@ extraLinksNodes.forEach(function(multiPair) {
     });	
 
 
-g.selectAll("text").data(root.descendants())
+if(showLabels){
+    g.selectAll("text").data(root.descendants())
     .enter().append("text")
         .attr("x", d => d.y)
         .attr("y", d => d.x)
@@ -102,6 +103,8 @@ g.selectAll("text").data(root.descendants())
         .attr("text-anchor", d => leafNodes.includes(d.data.child) ? "start" : "middle")
         .attr("font-size", d => 2 - 0.5 * d.depth + "em")
     .text(d => d.data.child.split(".").pop());
+}
+
 
 
     
