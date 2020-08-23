@@ -8,12 +8,6 @@ body {
     overflow: hidden;
 }
 
-path {
-    fill: none;
-    stroke: #878e8e;
-    stroke-width: 1.5px;
-}
-
 text {
     text-shadow:
       -1px -1px 3px white,
@@ -24,35 +18,12 @@ text {
     font-family: 'Playfair Display', serif;
 }
 
-.node circle {
-    fill: #fff;
-    stroke: steelblue;
-    stroke-width: 1.5px;
-  }
-
-
-  .node {
-    cursor: pointer;
-  }
+.node {
+  cursor: pointer;
+}
    
-  .node circle {
-    stroke: steelblue;
-    stroke-width: 1.5px;
-  }
+.node text {
+  font-size:10px; 
+  font-family:sans-serif;
+}
    
-  .node text {
-    font-size:10px; 
-    font-family:sans-serif;
-  }
-   
-  .link {
-    fill: none;
-    stroke: #ccc;
-    stroke-width: 1.5px;
-  }
-  
-  .additionalParentLink {
-    fill: none;
-    stroke: #878e8e;
-    stroke-width: 1.5px;
-  }

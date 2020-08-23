@@ -19,6 +19,9 @@ const margin = {top: 20, right: 150, bottom: 20, left: 150};
 const innerWidth = width - margin.left - margin.right; 
 const innerHeight = height - margin.top - margin.bottom;
 const tree = d3.tree()
+                    .separation(function(a, b){
+                        return (a.parent == b.parent ? 3 : 1) / a.depth;
+                    })
                     .size([innerHeight, innerWidth]);
 
 const zoomG = svg 
@@ -37,30 +40,46 @@ svg.attr("width", width)
     .attr("height", height);
 
 
+////////////////////////////
 const root = stratify(treeData);  //d3.hierarchy(treeData);
 const links = tree(root).links();
+let xCenters = {};
+for(var [key, value] of Object.entries(root.descendants())){
+    if (!xCenters[value.depth]){
+        xCenters[value.depth] = [value.x]; 
+    } else {
+        xCenters[value.depth].push(value.x);
+    }
+}
+
+for(const [key, val] of Object.entries(xCenters)){
+    xCenters[key] = calculateAve(val);
+}
+
+x0 = xCenters[0];
+for(const [key, val] of Object.entries(xCenters)){
+    xCenters[key] = val - x0;
+}
+
+const nodeColors = [];
+for (var i =0; i < Object.keys(xCenters).length; i++){
+    nodeColors.push(getRandomColor());
+}
+/////////////////////////////
 const linkPathGenerator = d3.linkHorizontal()
                             .x(d => d.y)
-                            .y(d => d.x);
+                            .y(d => d.x - xCenters[d.depth]);
 
 g.selectAll("path").data(links)
     .enter().append("path")
-    .attr("d", linkPathGenerator);
+        .attr("d", linkPathGenerator)
+    .each(function(d){
+        let sel = d3.select(this);
+        sel.attr("fill", "none")
+            .attr("stroke-width", "1px")
+            .attr("stroke", nodeColors[d.source.depth]);
+    });
 
-
-var node = g.selectAll(".node")
-    .data(root.descendants())
-    .enter().append("g")
-        .attr("class", function(d) { return "node" + (d.children ? " node--internal" : " node--leaf"); })
-        .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
-
-
-node.append("circle")
-        .attr("r", 10)
-        .each(function(){
-            let sel = d3.select(this);
-            sel.style("fill", getRandomColor());
-        });
 
 var extraLinksNodes = [];
 extraLinks.forEach(function(link){
@@ -72,25 +91,41 @@ extraLinks.forEach(function(link){
 
 extraLinksNodes.forEach(function(multiPair) {
         g.append("path")
-            .attr("class", "additionalParentLink")
             .attr("d", function() {
                 var oTarget = {
+                    x: multiPair.child.x - xCenters[multiPair.child.depth],
+                    y: multiPair.child.y
+                };
+                var oSource = {
                     x: multiPair.parent.x,
                     y: multiPair.parent.y
                 };
-                var oSource = {
-                    x: multiPair.child.x,
-                    y: multiPair.child.y
-                };
-                /*if (multiPair.child.depth === multiPair.couplingParent1.depth) {
-                    return "M" + oSource.y + " " + oSource.x + " L" + (oTarget.y + ((Math.abs((oTarget.x - oSource.x))) * 0.25)) + " " + oTarget.x + " " + oTarget.y + " " + oTarget.x;
-                }*/
-                return linkPathGenerator({
+                const extralinkPathGenerator = d3.linkHorizontal()
+                                                    .x(d => d.y)
+                                                    .y(d => d.x);
+                return extralinkPathGenerator({
                     source: oSource,
                     target: oTarget
                 });
-            });
+            })
+            .attr("fill", "none")
+            .attr("stroke-width", "1px")
+            .attr("stroke", nodeColors[multiPair.parent.depth]);
     });	
+
+
+var node = g.selectAll(".node")
+    .data(root.descendants())
+    .enter()
+        .append("g")
+            .attr("class", function(d) { return "node" + (d.children ? " node--internal" : " node--leaf"); })
+            .attr("transform", function(d) { return "translate(" + d.y + "," + (d.x - xCenters[d.depth]) + ")"; })
+        .append("circle")
+                .attr("r", 5)
+            .each(function(d){
+                let sel = d3.select(this);
+                sel.style("fill", nodeColors[d.depth]);
+            });
 
 
 if(showLabels){
@@ -106,14 +141,19 @@ if(showLabels){
 }
 
 
-
-    
 function getRandomColor() {
     var letters = '0123456789ABCDEF';
     var color = '#';
     for (var i = 0; i < 6; i++) {
         color += letters[Math.floor(Math.random() * 16)];
     }
-    console.log("color is ", color);
     return color;
+}
+
+function calculateAve(arr){
+    var total = 0;
+    for(var i = 0; i < arr.length; i++) {
+        total += arr[i];
+    }
+    return total / arr.length;
 }
