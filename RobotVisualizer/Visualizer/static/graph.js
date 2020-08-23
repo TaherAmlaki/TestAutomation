@@ -68,7 +68,7 @@ for (var i =0; i < Object.keys(xCenters).length; i++){
 /////////////////////////////
 const linkPathGenerator = d3.linkHorizontal()
                             .x(d => d.y)
-                            .y(d => d.x - xCenters[d.depth]);
+                            .y(d => d.x);
 
 g.selectAll("path").data(links)
     .enter().append("path")
@@ -93,17 +93,14 @@ extraLinksNodes.forEach(function(multiPair) {
         g.append("path")
             .attr("d", function() {
                 var oTarget = {
-                    x: multiPair.child.x - xCenters[multiPair.child.depth],
+                    x: multiPair.child.x,
                     y: multiPair.child.y
                 };
                 var oSource = {
                     x: multiPair.parent.x,
                     y: multiPair.parent.y
                 };
-                const extralinkPathGenerator = d3.linkHorizontal()
-                                                    .x(d => d.y)
-                                                    .y(d => d.x);
-                return extralinkPathGenerator({
+                return linkPathGenerator({
                     source: oSource,
                     target: oTarget
                 });
@@ -119,7 +116,7 @@ var node = g.selectAll(".node")
     .enter()
         .append("g")
             .attr("class", function(d) { return "node" + (d.children ? " node--internal" : " node--leaf"); })
-            .attr("transform", function(d) { return "translate(" + d.y + "," + (d.x - xCenters[d.depth]) + ")"; })
+            .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
         .append("circle")
                 .attr("r", 5)
             .each(function(d){
