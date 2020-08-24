@@ -1,6 +1,6 @@
 from enum import Enum, auto 
 from typing import List  
-# http://bl.ocks.org/robschmuecker/6afc2ecb05b191359862 for Graph with d3
+
 
 class NodeTypes(Enum):
     SUITE = auto()
@@ -25,6 +25,9 @@ class Node:
         if 0 < len(children):
             d['children'] = children 
         return d
+    
+    def __str__(self):
+        return self.name 
 
 
     
